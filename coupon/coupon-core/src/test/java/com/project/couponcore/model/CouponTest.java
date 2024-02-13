@@ -1,5 +1,7 @@
 package com.project.couponcore.model;
 
+import com.project.couponcore.exception.CouponIssueException;
+import com.project.couponcore.exception.ErrorCode;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -104,5 +106,55 @@ class CouponTest {
 
         // then
         Assertions.assertFalse(result);
+    }
+
+    @Test
+    @DisplayName("발급 수량과 발급 기간이 유효하다면 발급에 성공한다.")
+    void issue_1() {
+        // given
+        Coupon coupon = Coupon.builder()
+                .totalQuantity(100)
+                .issuedQuantity(99)
+                .dateIssueStart(LocalDateTime.now().minusDays(1))
+                .dateIssueEnd(LocalDateTime.now().plusDays(2))
+                .build();
+
+        // when
+        coupon.issue();
+
+        // then
+        Assertions.assertEquals(coupon.getIssuedQuantity(), 100);
+    }
+
+    @Test
+    @DisplayName("발급 수량을 초과하면 예외를 반환한다.")
+    void issue_2() {
+        // given
+        Coupon coupon = Coupon.builder()
+                .totalQuantity(100)
+                .issuedQuantity(100)
+                .dateIssueStart(LocalDateTime.now().minusDays(1))
+                .dateIssueEnd(LocalDateTime.now().plusDays(2))
+                .build();
+
+        // when & then
+        CouponIssueException exception = Assertions.assertThrows(CouponIssueException.class, coupon::issue);
+        Assertions.assertEquals(exception.getErrorCode(), ErrorCode.INVALID_COUPON_ISSUE_QUANTITY);
+    }
+
+    @Test
+    @DisplayName("발급 기간이 아니면 예외를 반환한다.")
+    void issue_3() {
+        // given
+        Coupon coupon = Coupon.builder()
+                .totalQuantity(100)
+                .issuedQuantity(99)
+                .dateIssueStart(LocalDateTime.now().plusDays(1))
+                .dateIssueEnd(LocalDateTime.now().plusDays(2))
+                .build();
+
+        // when & then
+        CouponIssueException exception = Assertions.assertThrows(CouponIssueException.class, coupon::issue);
+        Assertions.assertEquals(exception.getErrorCode(), ErrorCode.INVALID_COUPON_ISSUE_DATE);
     }
 }
