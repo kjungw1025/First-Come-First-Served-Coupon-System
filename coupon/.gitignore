@@ -40,3 +40,12 @@ out/
 application-core.yml
 application-api.yml
 application-consumer.yml
+
+### docker-compose.yml ###
+docker-compose.yml
+
+### Python ###
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
