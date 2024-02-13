@@ -49,3 +49,6 @@ docker-compose.yml
 __pycache__/
 *.py[cod]
 *$py.class
+
+### MySQL ###
+**/resources/sql
