@@ -59,4 +59,33 @@ class CouponIssueRedisServiceTest extends TestConfig {
         // then
         Assertions.assertFalse(result);
     }
+
+    @Test
+    @DisplayName("쿠폰 중복 발급 검증 - 발급된 내역에 유저가 존재하지 않으면 true를 반환한다.")
+    void availableUserIssueQuantity_1() {
+        // given
+        long couponId = 1;
+        long userId = 1;
+
+        // when
+        boolean result = sut.availableUserIssueQuantity(couponId, userId);
+
+        // then
+        Assertions.assertTrue(result);
+    }
+
+    @Test
+    @DisplayName("쿠폰 중복 발급 검증 - 발급된 내역에 유저가 존재하면 false를 반환한다.")
+    void availableUserIssueQuantity_2() {
+        // given
+        long couponId = 1;
+        long userId = 1;
+        redisTemplate.opsForSet().add(getIssueRequestKey(couponId), String.valueOf(userId));
+
+        // when
+        boolean result = sut.availableUserIssueQuantity(couponId, userId);
+
+        // then
+        Assertions.assertFalse(result);
+    }
 }
