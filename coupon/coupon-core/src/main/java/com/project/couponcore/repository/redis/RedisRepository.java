@@ -24,4 +24,9 @@ public class RedisRepository {
     public Boolean sIsMember(String key, String value) {
         return redisTemplate.opsForSet().isMember(key, value);
     }
+
+    // 쿠폰 발급 큐에 적재하기 위한 리스트 자료구조 활용
+    public Long rPush(String key, String value) {
+        return redisTemplate.opsForList().rightPush(key, value);
+    }
 }
