@@ -13,6 +13,10 @@ dependencies {
     // redisson
     implementation("org.redisson:redisson-spring-boot-starter:3.16.4")
 
+    // jackson
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+    implementation("com.fasterxml.jackson.core:jackson-databind")
+
     // test
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
