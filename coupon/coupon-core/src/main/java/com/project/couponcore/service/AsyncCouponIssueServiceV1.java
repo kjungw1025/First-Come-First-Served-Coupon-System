@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.couponcore.component.DistributeLockExecutor;
 import com.project.couponcore.exception.CouponIssueException;
-import com.project.couponcore.model.Coupon;
 import com.project.couponcore.model.CouponRedisEntity;
 import com.project.couponcore.model.dto.request.RequestCouponIssueDto;
 import com.project.couponcore.repository.redis.RedisRepository;
@@ -20,7 +19,6 @@ import static com.project.couponcore.util.CouponRedisUtils.getIssueRequestQueueK
 public class AsyncCouponIssueServiceV1 {
     private final RedisRepository redisRepository;
     private final CouponIssueRedisService couponIssueRedisService;
-    private final CouponIssueService couponIssueService;
     private final CouponCacheService couponCacheService;
 
     private final DistributeLockExecutor distributeLockExecutor;
@@ -28,19 +26,13 @@ public class AsyncCouponIssueServiceV1 {
 
     public void issue(long couponId, long userId) {
 
+        // 캐시를 통해 쿠폰에 대한 유효성 검증 수행
         CouponRedisEntity coupon = couponCacheService.getCouponCache(couponId);
         coupon.checkIssuableCoupon();
 
         // 레디스 동시성 이슈 해결하기 위함
-        distributeLockExecutor.execute("lock %s".formatted(couponId), 3000, 3000, () -> {
-            if (!couponIssueRedisService.availableTotalIssueQuantity(coupon.totalQuantity(), couponId)) {
-                throw new CouponIssueException(INVALID_COUPON_ISSUE_QUANTITY, "발급 가능한 수량을 초과합니다. couponId: %s, userId: %s".formatted(couponId, userId));
-            }
-
-            if (!couponIssueRedisService.availableUserIssueQuantity(couponId, userId)) {
-                throw new CouponIssueException(DUPLICATED_COUPON_ISSUE, "이미 발급 요청이 처리됐습니다. couponId: %s, userId: %s".formatted(couponId, userId));
-            }
-
+        distributeLockExecutor.execute("lock_%s".formatted(couponId), 3000, 3000, () -> {
+            couponIssueRedisService.checkCouponIssueQuantity(coupon, userId);
             issueRequest(couponId, userId);
         });
     }
