@@ -3,6 +3,7 @@ package com.project.couponapi.service;
 import com.project.couponapi.controller.dto.CouponIssueRequestDto;
 import com.project.couponcore.component.DistributeLockExecutor;
 import com.project.couponcore.service.AsyncCouponIssueServiceV1;
+import com.project.couponcore.service.AsyncCouponIssueServiceV2;
 import com.project.couponcore.service.CouponIssueService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,7 @@ public class CouponIssueRequestService {
     private final CouponIssueService couponIssueService;
     private final DistributeLockExecutor distributeLockExecutor;
     private final AsyncCouponIssueServiceV1 asyncCouponIssueServiceV1;
+    private final AsyncCouponIssueServiceV2 asyncCouponIssueServiceV2;
 
     public void issueRequestV1(CouponIssueRequestDto requestDto) {
         distributeLockExecutor.execute("lock_" + requestDto.couponId(), 10000, 10000, () -> {
@@ -25,5 +27,9 @@ public class CouponIssueRequestService {
 
     public void asyncIssueRequestV1(CouponIssueRequestDto requestDto) {
         asyncCouponIssueServiceV1.issue(requestDto.couponId(), requestDto.userId());
+    }
+
+    public void asyncIssueRequestV2(CouponIssueRequestDto requestDto) {
+        asyncCouponIssueServiceV2.issue(requestDto.couponId(), requestDto.userId());
     }
 }
