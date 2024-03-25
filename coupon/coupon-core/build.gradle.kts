@@ -17,6 +17,9 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     implementation("com.fasterxml.jackson.core:jackson-databind")
 
+    // memory cache
+    implementation("com.github.ben-manes.caffeine:caffeine")
+
     // test
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
