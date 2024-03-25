@@ -15,7 +15,7 @@ public class AsyncCouponIssueServiceV2 {
     public void issue(long couponId, long userId) {
 
         // 캐시를 통해 쿠폰에 대한 유효성 검증 수행
-        CouponRedisEntity coupon = couponCacheService.getCouponCache(couponId);
+        CouponRedisEntity coupon = couponCacheService.getCouponLocalCache(couponId);
         coupon.checkIssuableCoupon();
 
         // Redis Script 내용 수행
