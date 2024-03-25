@@ -44,6 +44,23 @@ public class RedisRepository {
         return redisTemplate.opsForList().rightPush(key, value);
     }
 
+    // --------------------- 발급에서 사용 ----------------------
+    // 쿠폰 발급 큐의 사이즈 확인
+    public Long lSize(String key) {
+        return redisTemplate.opsForList().size(key);
+    }
+
+    // 인덱스 값 가져오지
+    public String lIndex(String key, long index) {
+        return redisTemplate.opsForList().index(key, index);
+    }
+
+    // 쿠폰 발급 큐에 적재되었던 내용을 pop 해주는 용도
+    public String lPop(String key) {
+        return redisTemplate.opsForList().leftPop(key);
+    }
+    // -------------------------------------------------------
+
     public void issueRequest(long couponId, long userId, int totalIssueQuantity) {
         String issueRequestKey = getIssueRequestKey(couponId);
         RequestCouponIssueDto requestCouponIssueDto = new RequestCouponIssueDto(couponId, userId);
