@@ -75,6 +75,7 @@ application-consumer.yml
 
 ### docker-compose.yml ###
 docker-compose.yml
+docker-compose-ngrinder.yml
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
@@ -84,3 +85,6 @@ __pycache__/
 
 ### MySQL ###
 **/resources/sql
+
+### nGrinder ###
+**/ngrinder-controller/
