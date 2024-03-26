@@ -4,6 +4,7 @@ import com.project.couponcore.model.Coupon;
 import com.project.couponcore.model.CouponRedisEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.aop.framework.AopContext;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -30,5 +31,18 @@ public class CouponCacheService {
 
     private CouponCacheService proxy() {
         return ((CouponCacheService) AopContext.currentProxy());
+    }
+
+    /**
+     * 아래는 쿠폰 발급이 끝났을 때 수행되는 메소드들
+     */
+    @CachePut(cacheNames = "coupon")
+    public CouponRedisEntity putCouponCache(long couponId) {
+        return getCouponCache(couponId);
+    }
+
+    @CachePut(cacheNames = "coupon", cacheManager = "localCacheManager")
+    public CouponRedisEntity putCouponLocalCache(long couponId) {
+        return getCouponLocalCache(couponId);
     }
 }
