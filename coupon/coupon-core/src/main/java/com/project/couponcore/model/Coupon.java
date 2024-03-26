@@ -79,4 +79,12 @@ public class Coupon extends BaseTimeEntity {
 
         issuedQuantity++;
     }
+
+    /**
+     * 쿠폰 발급이 끝났는지 확인
+     */
+    public boolean isIssueComplete() {
+        LocalDateTime now = LocalDateTime.now();
+        return dateIssueEnd.isBefore(now) || !availableIssueQuantity();
+    }
 }

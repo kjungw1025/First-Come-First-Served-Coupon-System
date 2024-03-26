@@ -4,10 +4,12 @@ import com.project.couponcore.exception.CouponIssueException;
 import com.project.couponcore.exception.ErrorCode;
 import com.project.couponcore.model.Coupon;
 import com.project.couponcore.model.CouponIssue;
+import com.project.couponcore.model.event.CouponIssueCompleteEvent;
 import com.project.couponcore.repository.mysql.CouponIssueJpaRepository;
 import com.project.couponcore.repository.mysql.CouponIssueRepository;
 import com.project.couponcore.repository.mysql.CouponJpaRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +19,7 @@ public class CouponIssueService {
     private final CouponJpaRepository couponJpaRepository;
     private final CouponIssueJpaRepository couponIssueJpaRepository;
     private final CouponIssueRepository couponIssueRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     /**
      * 실제 쿠폰에 대한 발급을 검증하고, 발급 처리 진행
@@ -26,6 +29,7 @@ public class CouponIssueService {
         Coupon coupon = findCoupon(couponId);
         coupon.issue();
         saveCouponIssue(couponId, userId);
+        publishCouponEvent(coupon);
     }
 
     /**
@@ -59,6 +63,15 @@ public class CouponIssueService {
 
         if (issue != null) {
             throw new CouponIssueException(ErrorCode.DUPLICATED_COUPON_ISSUE, "이미 발급된 쿠폰입니다. user_id : %s, coupon_id : %s".formatted(userId, couponId));
+        }
+    }
+
+    /**
+     * 쿠폰 발급 수량이 모두 소진되었을 때, 이벤트가 발생함
+     */
+    private void publishCouponEvent(Coupon coupon) {
+        if (coupon.isIssueComplete()) {
+            applicationEventPublisher.publishEvent(new CouponIssueCompleteEvent(coupon.getId()));
         }
     }
 }
