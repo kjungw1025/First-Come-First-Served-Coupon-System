@@ -88,3 +88,6 @@ __pycache__/
 
 ### nGrinder ###
 **/ngrinder-controller/
+
+### Prometheus / Grafana ###
+**/monitoring/
